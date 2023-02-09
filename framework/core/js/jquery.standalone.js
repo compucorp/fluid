@@ -22,11 +22,11 @@
 /* global global */
 /* exported jQuery */
 
-var fluid_3_0_0 = fluid_3_0_0 || {}; // eslint-disable-line no-redeclare
-var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
+"use strict";
 
-(function (fluid) {
-    "use strict";
+var fluid = fluid || {}; // eslint-disable-line no-redeclare
+
+(function () {
 
     // Save a reference to some core methods
     var toString = Object.prototype.toString;
@@ -38,8 +38,18 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
     // Map over the $ in case of overwrite
     var _$ = globalScope.$;
 
-    var jQuery = fluid.jQueryStandalone = {
+    var jQuery = fluid.jQueryStandalone = function (/* arguments */) {
+        return jQuery.constructor.apply(null, arguments);
+    };
 
+    // Define all the members in a fresh object, so that they can later be copied onto the function just defined
+    var jQueryMembers = {
+        globalScope: globalScope,
+
+        // A placeholder for the jQuery constructor function, which will be patched elsewhere
+        constructor: function () {
+            return [];
+        },
         // The current version of jQuery being used
         jquery: "1.6.1-fluidStandalone",
 
@@ -149,6 +159,9 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
         }
     };
 
-})(fluid_3_0_0);
+    jQueryMembers.extend(jQuery, jQueryMembers);
+
+})();
 
 var jQuery = fluid.jQueryStandalone; // eslint-disable-line no-redeclare
+var $ = jQuery; // eslint-disable-line no-redeclare, no-unused-vars

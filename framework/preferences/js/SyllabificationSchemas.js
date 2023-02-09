@@ -11,57 +11,44 @@ You may obtain a copy of the ECL 2.0 License and BSD License at
 https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
 */
 
-(function (fluid) {
-    "use strict";
+"use strict";
 
-    /*******************************************************************************
-    * Starter auxiliary schema grade
-    *
-    * Contains the settings for syllabification
-    *******************************************************************************/
+/*******************************************************************************
+* Auxiliary schema grade
+*
+* Contains the settings for syllabification
+*******************************************************************************/
 
-    // Fine-tune the starter aux schema and add syllabification panel
-    fluid.defaults("fluid.prefs.auxSchema.syllabification", {
-        gradeNames: ["fluid.prefs.auxSchema"],
-        auxiliarySchema: {
-            "namespace": "fluid.prefs.constructed",
-            "terms": {
-                "templatePrefix": "../../framework/preferences/html",
-                "messagePrefix": "../../framework/preferences/messages"
+fluid.defaults("fluid.prefs.auxSchema.syllabification", {
+    gradeNames: ["fluid.prefs.auxSchema"],
+    auxiliarySchema: {
+        "fluid.prefs.syllabification": {
+            enactor: {
+                type: "fluid.prefs.enactor.syllabification"
             },
-            "template": "%templatePrefix/SeparatedPanelPrefsEditor.html",
-            "message": "%messagePrefix/prefsEditor.json",
-            syllabification: {
-                type: "fluid.prefs.syllabification",
-                enactor: {
-                    type: "fluid.prefs.enactor.syllabification",
-                    container: "body"
-                },
-                panel: {
-                    type: "fluid.prefs.panel.syllabification",
-                    container: ".flc-prefsEditor-syllabification",
-                    template: "%templatePrefix/PrefsEditorTemplate-syllabification.html",
-                    message: "%messagePrefix/syllabification.json"
-                }
+            panel: {
+                type: "fluid.prefs.panel.syllabification",
+                container: ".flc-prefsEditor-syllabification",
+                template: "%templatePrefix/PrefsEditorTemplate-syllabification.html",
+                message: "%messagePrefix/syllabification.json"
             }
         }
-    });
+    }
+});
 
 
-    /*******************************************************************************
-    * Primary Schema
-    *******************************************************************************/
+/*******************************************************************************
+* Primary Schema
+*******************************************************************************/
 
-    // add extra prefs to the starter primary schemas
+// add extra prefs to the starter primary schemas
 
-    fluid.defaults("fluid.prefs.schemas.syllabification", {
-        gradeNames: ["fluid.prefs.schemas"],
-        schema: {
-            "fluid.prefs.syllabification": {
-                "type": "boolean",
-                "default": false
-            }
+fluid.defaults("fluid.prefs.schemas.syllabification", {
+    gradeNames: ["fluid.prefs.schemas"],
+    schema: {
+        "fluid.prefs.syllabification": {
+            "type": "boolean",
+            "default": false
         }
-    });
-
-})(fluid_3_0_0);
+    }
+});

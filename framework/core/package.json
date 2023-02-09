@@ -1,7 +1,7 @@
 {
     "name": "fluid-framework",
     "description": "A suite of core Infusion framework features, including support for events, views, data binding, and keyboard accessibility. Required by all Fluid components.",
-    "version": "3.0.0",
+    "version": "4.1.0",
     "license": "(BSD-3-Clause OR ECL-2.0)",
     "infusion": {
         "cssFiles": [
@@ -23,9 +23,10 @@
             "./js/ModelTransformationTransforms.js",
             "./js/jquery.keyboard-a11y.js",
             "./js/FluidView.js",
-            "./js/FluidRequests.js",
+            "./js/FluidView-browser.js",
             "./js/MessageResolver.js",
             "./js/ResourceLoader.js",
+            "./js/ResourceLoader-browser.js",
             "./js/NewViewSupport.js",
             "./js/MutationObserver.js",
             "./js/TextNodeParser.js"
