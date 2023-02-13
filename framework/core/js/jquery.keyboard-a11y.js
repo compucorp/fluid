@@ -11,11 +11,11 @@ You may obtain a copy of the ECL 2.0 License and BSD License at
 https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
 */
 
-var fluid_3_0_0 = fluid_3_0_0 || {}; // eslint-disable-line no-redeclare
-var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
+"use strict";
 
-(function ($, fluid) {
-    "use strict";
+var fluid = fluid || {}; // eslint-disable-line no-redeclare
+
+(function ($) {
 
     // $().fluid("selectable", args)
     // $().fluid("selectable".that()
@@ -62,7 +62,6 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
     };
 
     fluid.thatistBridge("fluid", fluid);
-    fluid.thatistBridge("fluid_3_0_0", fluid_3_0_0);
 
     /*************************************************************************
      * Tabindex normalization - compensate for browser differences in naming
@@ -70,11 +69,6 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
      *************************************************************************/
 
     // -- Private functions --
-
-
-    var normalizeTabindexName = function () {
-        return $.browser.msie ? "tabIndex" : "tabindex";
-    };
 
     var canHaveDefaultTabindex = function (elements) {
         if (elements.length <= 0) {
@@ -94,13 +88,13 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
         }
 
         // Get the attribute and return it as a number value.
-        var value = elements.attr(normalizeTabindexName());
+        var value = elements.attr("tabindex");
         return Number(value);
     };
 
     var setValue = function (elements, toIndex) {
         return elements.each(function (i, item) {
-            $(item).attr(normalizeTabindexName(), toIndex);
+            $(item).attr("tabindex", toIndex);
         });
     };
 
@@ -129,7 +123,7 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
     fluid.tabindex.remove = function (target) {
         target = $(target);
         return target.each(function (i, item) {
-            $(item).removeAttr(normalizeTabindexName());
+            $(item).removeAttr("tabindex");
         });
     };
 
@@ -143,7 +137,7 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
         }
         var togo = target.map(
             function () {
-                var attributeNode = this.getAttributeNode(normalizeTabindexName());
+                var attributeNode = this.getAttributeNode("tabindex");
                 return attributeNode ? attributeNode.specified : false;
             }
         );
@@ -619,5 +613,4 @@ var fluid = fluid || fluid_3_0_0; // eslint-disable-line no-redeclare
         keys: [$.ui.keyCode.ENTER, $.ui.keyCode.SPACE]
     };
 
-
-})(jQuery, fluid_3_0_0);
+})(jQuery);

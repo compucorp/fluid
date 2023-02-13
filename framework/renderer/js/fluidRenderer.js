@@ -11,10 +11,9 @@ You may obtain a copy of the ECL 2.0 License and BSD License at
 https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
 */
 
-(function ($, fluid) {
-    "use strict";
+"use strict";
 
-
+(function () {
 
     function debugPosition(component) {
         return "as child of " + (component.parent.fullID ? "component with full ID " + component.parent.fullID : "root");
@@ -269,14 +268,12 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
     renderer.invokeFluidDecorator = function (func, args, ID, num, options) {
         var that;
         if (options.parentComponent) {
-            var parent = options.parentComponent;
             var name = renderer.IDtoComponentName(ID, num);
-            fluid.set(parent, ["options", "components", name], {
-                type: func,
-                container: args[0],
-                options: args[1]
-            });
-            that = fluid.initDependent(options.parentComponent, name);
+            that = fluid.constructChild(options.parentComponent, name,
+                $.extend({
+                    type: func,
+                    container: args[0]
+                }, args[1]));
         }
         else {
             that = fluid.invokeGlobalFunction(func, args);
@@ -284,7 +281,7 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
         return that;
     };
 
-    fluid.renderer = function (templates, tree, options, fossilsIn) {
+    fluid.oldRenderer = function (templates, tree, options, fossilsIn) {
 
         options = options || {};
         tree = tree || {};
@@ -601,13 +598,6 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
             }
             if (renderOptions.autoBind && /input|select|textarea/.test(tagname) && !renderedbindings[finalID]) {
                 var decorators = [{jQuery: ["on", "change", applyFunc]}];
-                // Work around bug 193: http://webbugtrack.blogspot.com/2007/11/bug-193-onchange-does-not-fire-properly.html
-                if ($.browser.msie && tagname === "input" && /radio|checkbox/.test(trc.attrcopy.type)) {
-                    decorators.push({jQuery: ["on", "click", applyFunc]});
-                }
-                if ($.browser.safari && tagname === "input" && trc.attrcopy.type === "radio") {
-                    decorators.push({jQuery: ["on", "keyup", applyFunc]});
-                }
                 outDecoratorsImpl(torender, decorators, trc.attrcopy, finalID);
             }
         }
@@ -774,7 +764,7 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
                 else if (type === "addClass" || type === "removeClass") {
                     // Using an unattached DOM node because jQuery will use the
                     // node's setAttribute method to add the class.
-                    var fakeNode = $("<div>", {class: attrcopy["class"]})[0];
+                    var fakeNode = $("<div>", {"class": attrcopy["class"]})[0];
                     renderOptions.jQuery(fakeNode)[type](decorator.classes);
                     attrcopy["class"] = fakeNode.className;
                 }
@@ -1410,7 +1400,9 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
 
     };
 
-    jQuery.extend(true, fluid.renderer, renderer);
+    // Final definition for backwards compatibility - remove with old renderer
+    $.extend(fluid.oldRenderer, fluid.renderer, renderer);
+    fluid.renderer = fluid.oldRenderer;
 
     /*
      * This function is unsupported: It is not really intended for use by implementors.
@@ -1472,21 +1464,16 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
      */
     fluid.reRender = function (templates, node, tree, options) {
         options = options || {};
-        var renderer = fluid.renderer(templates, tree, options, options.fossils);
+        var renderer = fluid.oldRenderer(templates, tree, options, options.fossils);
         options = renderer.options;
         // Empty the node first, to head off any potential id collisions when rendering
         node = fluid.unwrap(node);
-        var lastFocusedElement = fluid.getLastFocusedElement ? fluid.getLastFocusedElement() : null;
+        var lastFocusedElement = fluid.lastFocusedElement;
         var lastId;
-        if (lastFocusedElement && fluid.dom.isContainer(node, lastFocusedElement)) {
+        if (lastFocusedElement && node.contains(lastFocusedElement)) {
             lastId = lastFocusedElement.id;
         }
-        if ($.browser.msie) {
-            options.jQuery(node).empty(); //- this operation is very slow.
-        }
-        else {
-            node.innerHTML = "";
-        }
+        node.innerHTML = "";
 
         var rendered = renderer.renderTemplates();
         if (options.renderRaw) {
@@ -1496,12 +1483,8 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
         if (options.model) {
             fluid.bindFossils(node, options.model, options.fossils);
         }
-        if ($.browser.msie) {
-            options.jQuery(node).html(rendered);
-        }
-        else {
-            node.innerHTML = rendered;
-        }
+        node.innerHTML = rendered;
+
         renderer.processDecoratorQueue();
         if (lastId) {
             var element = fluid.byId(lastId, options.document);
@@ -1551,10 +1534,11 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
             template = fluid.extractTemplate(fluid.unwrap(source.node), source.armouring);
         }
         target = fluid.unwrap(target);
+
         var resourceSpec = {
             base: {
                 resourceText: template,
-                href: ".", resourceKey: ".", cutpoints: options.cutpoints
+                url: ".", resourceKey: ".", cutpoints: options.cutpoints
             }
         };
         var templates = fluid.parseTemplates(resourceSpec, ["base"], options);
@@ -1578,4 +1562,4 @@ https://github.com/fluid-project/infusion/raw/main/Infusion-LICENSE.txt
         return fluid.render({node: node, armouring: options.armouring}, node, tree, options);
     };
 
-})(jQuery, fluid_3_0_0);
+})();
